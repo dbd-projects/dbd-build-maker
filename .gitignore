@@ -29,3 +29,8 @@ hs_err_pid*
 .settings/*
 .vscode
 .vscode/*
+
+target/*
+project/target/*
+project/project/*
+*.iml

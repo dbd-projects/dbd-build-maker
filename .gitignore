@@ -29,6 +29,8 @@ hs_err_pid*
 .settings/*
 .vscode
 .vscode/*
+.clover
+.clover/*
 
 target/*
 project/target/*

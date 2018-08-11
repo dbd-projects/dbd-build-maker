@@ -12,4 +12,16 @@ libraryDependencies ++= Seq(javaJdbc, cache, javaWs)
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
 
-      
+jacocoExcludes in Test := Seq(
+  "controllers.Reverse*",
+  "controllers.javascript.*",
+  "controllers.ReverseApplication",
+  "controllers.ReverseAssets",
+  "jooq.*",
+  "Module",
+  "router.Routes*",
+  "*.routes*"
+)
+jacocoIncludes in Test := Seq(
+  "controllers.*"
+)

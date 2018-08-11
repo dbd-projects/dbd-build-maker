@@ -1,5 +1,3 @@
-package tests;
-
 import controllers.Application;
 import org.junit.Test;
 import play.Logger;

@@ -34,6 +34,7 @@ jacocoIncludes in Test := Seq(
 )
 
 jacocoReportSettings := JacocoReportSettings()
+  .withFormats(JacocoReportFormats.XML)
   .withThresholds(
     JacocoThresholds(
       instruction = 0,

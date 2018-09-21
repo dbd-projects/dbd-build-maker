@@ -3,7 +3,14 @@
 # ~~~~
 
 # Home page
-GET        /                    controllers.Application.index()
+GET        /                    controllers.Application.index
+
+# Addons
+GET        /addons              controllers.AddonController.getAllAddons
+GET        /addons/:id          controllers.AddonController.getAddon(id: Long)
+POST       /addons/new          controllers.AddonController.createAddon
+PUT        /addons/:id          controllers.AddonController.updateAddon(id: Long)
+DELETE     /addons/:id          controllers.AddonController.deleteAddon(id: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET        /assets/*file        controllers.Assets.at(path="/public", file)

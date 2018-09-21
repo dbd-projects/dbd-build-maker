@@ -10,7 +10,7 @@ scalaVersion := "2.11.11"
 
 libraryDependencies ++= Seq(javaJdbc, cache, javaWs)
 
-unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
+unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
 
 jacocoExcludes in Test := Seq(
   "controllers.Reverse*",

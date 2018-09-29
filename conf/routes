@@ -12,5 +12,26 @@ POST       /addons/new          controllers.AddonController.createAddon
 PUT        /addons/:id          controllers.AddonController.updateAddon(id: Long)
 DELETE     /addons/:id          controllers.AddonController.deleteAddon(id: Long)
 
+# Characters
+GET        /characters              controllers.CharacterController.getAllCharacters
+GET        /characters/:id          controllers.CharacterController.getCharacter(id: Long)
+POST       /characters/new          controllers.CharacterController.createCharacter
+PUT        /characters/:id          controllers.CharacterController.updateCharacter(id: Long)
+DELETE     /characters/:id          controllers.CharacterController.deleteCharacter(id: Long)
+
+# Items
+GET        /items              controllers.ItemController.getAllItems
+GET        /items/:id          controllers.ItemController.getItem(id: Long)
+POST       /items/new          controllers.ItemController.createItem
+PUT        /items/:id          controllers.ItemController.updateItem(id: Long)
+DELETE     /items/:id          controllers.ItemController.deleteItem(id: Long)
+
+# Perks
+GET        /perks              controllers.PerkController.getAllPerks
+GET        /perks/:id          controllers.PerkController.getPerk(id: Long)
+POST       /perks/new          controllers.PerkController.createPerk
+PUT        /perks/:id          controllers.PerkController.updatePerk(id: Long)
+DELETE     /perks/:id          controllers.PerkController.deletePerk(id: Long)
+
 # Map static resources from the /public folder to the /assets URL path
 GET        /assets/*file        controllers.Assets.at(path="/public", file)

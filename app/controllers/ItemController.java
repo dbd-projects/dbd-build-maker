@@ -1,8 +1,8 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import models.Item;
 import models.CharacterType;
+import models.Item;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.BodyParser;
@@ -23,12 +23,20 @@ public class ItemController extends Controller {
      *
      * @return Result Json list of items
      */
+    @BodyParser.Of(BodyParser.Json.class)
     public Result getAllItems() {
-        List<Item> items = Item.find.all();
-        if(items == null || items.size() == 0) {
-            return ok("No items in database");
+        List<Item> items;
+        try {
+            if(request().body().asJson().has("type")) {
+                String type = request().body().asJson().get("type").textValue();
+                items = Item.find.query().where().eq("type", type).findList();
+            }else {
+                items = Item.find.all();
+            }
+            return ok(Json.toJson(items));
+        }catch (NullPointerException e) {
+            return noContent();
         }
-        return ok(Json.toJson(items));
     }
 
     /**

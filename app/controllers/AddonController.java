@@ -23,9 +23,16 @@ public class AddonController extends Controller {
      *
      * @return Result Json list of addons
      */
+    @BodyParser.Of(BodyParser.Json.class)
     public Result getAllAddons() {
+        List<Addon> addons;
         try {
-            List<Addon> addons = Addon.find.all();
+            if(request().body().asJson().has("type")) {
+                String type = request().body().asJson().get("type").textValue();
+                addons = Addon.find.query().where().eq("type", type).findList();
+            }else {
+                addons = Addon.find.all();
+            }
             return ok(Json.toJson(addons));
         }catch (NullPointerException e) {
             return noContent();

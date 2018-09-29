@@ -23,12 +23,20 @@ public class CharacterController extends Controller {
      *
      * @return Result Json list of characters
      */
+    @BodyParser.Of(BodyParser.Json.class)
     public Result getAllCharacters() {
-        List<Character> characters = Character.find.all();
-        if(characters == null || characters.size() == 0) {
-            return ok("No characters in database");
+        List<Character> characters;
+        try {
+            if(request().body().asJson().has("type")) {
+                String type = request().body().asJson().get("type").textValue();
+                characters = Character.find.query().where().eq("type", type).findList();
+            }else {
+                characters = Character.find.all();
+            }
+            return ok(Json.toJson(characters));
+        }catch (NullPointerException e) {
+            return noContent();
         }
-        return ok(Json.toJson(characters));
     }
 
     /**

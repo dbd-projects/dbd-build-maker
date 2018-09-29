@@ -23,12 +23,20 @@ public class PerkController extends Controller {
      *
      * @return Result Json list of perks
      */
+    @BodyParser.Of(BodyParser.Json.class)
     public Result getAllPerks() {
-        List<Perk> perks = Perk.find.all();
-        if(perks == null || perks.size() == 0) {
-            return ok("No perks in database");
+        List<Perk> perks;
+        try {
+            if(request().body().asJson().has("type")) {
+                String type = request().body().asJson().get("type").textValue();
+                perks = Perk.find.query().where().eq("type", type).findList();
+            }else {
+                perks = Perk.find.all();
+            }
+            return ok(Json.toJson(perks));
+        }catch (NullPointerException e) {
+            return noContent();
         }
-        return ok(Json.toJson(perks));
     }
 
     /**

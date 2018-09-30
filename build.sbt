@@ -8,7 +8,7 @@ resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
 scalaVersion := "2.11.11"
 
-libraryDependencies ++= Seq(javaJdbc, cache, javaWs)
+libraryDependencies ++= Seq(javaJdbc, guice, javaWs)
 libraryDependencies += "org.mockito" % "mockito-core" % "2.21.0"
 
 unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")

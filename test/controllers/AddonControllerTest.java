@@ -1,12 +1,17 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableMap;
 import models.Addon;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mock;
 import play.Application;
 import play.Logger;
+import play.db.Database;
+import play.db.Databases;
+import play.db.evolutions.Evolutions;
 import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -25,19 +30,32 @@ public class AddonControllerTest {
     Addon addon;
 
     private Application application;
+    private Database database;
 
     @Before
     public void init() {
         application = Helpers.fakeApplication(Helpers.inMemoryDatabase());
         Helpers.start(application);
+        database = Databases.inMemory(
+                "testdb",
+                ImmutableMap.of(
+                        "MODE","MySQL"
+                ),
+                ImmutableMap.of(
+                        "logStatements", true
+                )
+        );
+        Evolutions.applyEvolutions(database);
     }
 
     @After
     public void cleanUp() {
+        Evolutions.cleanupEvolutions(database);
+        database.shutdown();
         Helpers.stop(application);
     }
 
-    //@Test
+    @Test
     public void testGetZeroAddons() {
         for(Addon addon : Addon.find.all()){
             addon.delete();
@@ -48,7 +66,7 @@ public class AddonControllerTest {
         assertEquals(NO_CONTENT, result.status());
     }
 
-    //@Test
+    @Test
     public void testCreateAddon() {
         JsonNode jsonNode = Json.toJson(addon);
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
@@ -58,7 +76,7 @@ public class AddonControllerTest {
         assertEquals(OK, result.status());
     }
 
-    //@Test
+    @Test
     public void testCreateExistingAddon() {
         JsonNode jsonNode = Json.toJson(addon);
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
@@ -68,22 +86,21 @@ public class AddonControllerTest {
         assertEquals(BAD_REQUEST, result.status());
     }
 
-    //@Test
+    @Test
     public void testGetAllAddons() {
         Logger.info("Testing getAllAddons...");
         Result result = new AddonController().getAllAddons();
         Logger.info("...Test for OK result");
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
-        assertTrue(ControllerTestHelper.testCharset("UTF-8", result));
     }
 
-    //@Test
+    @Test
     public void testGetAddon() {
 
     }
 
-    //@Test
+    @Test
     public void testDeleteAddon() {
 
     }

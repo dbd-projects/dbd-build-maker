@@ -23,7 +23,6 @@ public class CharacterController extends Controller {
      *
      * @return Result Json list of characters
      */
-    @BodyParser.Of(BodyParser.Json.class)
     public Result getAllCharacters() {
         List<Character> characters;
         try {
@@ -48,7 +47,7 @@ public class CharacterController extends Controller {
     public Result getCharacter(final long id) {
         Character character = Character.find.byId(id);
         if(character == null) {
-            return notFound("Could not find character by id: "+id);
+            return noContent();
         }
         return ok(Json.toJson(character));
     }
@@ -56,18 +55,29 @@ public class CharacterController extends Controller {
     /**
      * HTTP Post request that creates a new Character
      *
-     * @param name The String name of a Character
-     * @param description The String description of a Character
-     * @param type The String type of a Character
      * @return Result Json of a character
      */
-    public Result createCharacter(final String name, final String description, final CharacterType type) {
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result createCharacter() {
+        final JsonNode body = request().body().asJson();
+        final String name = body.get("name").textValue();
+        final String description = body.get("description").textValue();
+        final String type = body.get("type").textValue();
+        if(name == null || description == null || type == null) {
+            return badRequest("Some data missing from request.");
+        }
         if(Character.find.query().where().eq("name", name).findUnique() != null) {
             return badRequest("A character already exists with the name, "+name);
         }
-        Character character = new Character(type, name, description);
-        character.save();
-        return ok(Json.toJson(character));
+        try {
+            CharacterType characterType = CharacterType.valueOf(type);
+            Character character = new Character(characterType, name, description);
+            character.save();
+            return ok(Json.toJson(character));
+        }catch(Exception e) {
+            Logger.info("An invalid CharacterType was supplied for updateCharacter");
+            return badRequest("The CharacterType supplied was invalid");
+        }
     }
 
     /**

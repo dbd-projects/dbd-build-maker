@@ -23,7 +23,6 @@ public class ItemController extends Controller {
      *
      * @return Result Json list of items
      */
-    @BodyParser.Of(BodyParser.Json.class)
     public Result getAllItems() {
         List<Item> items;
         try {
@@ -48,7 +47,7 @@ public class ItemController extends Controller {
     public Result getItem(final long id) {
         Item item = Item.find.byId(id);
         if(item == null) {
-            return notFound("Could not find item by id: "+id);
+            return noContent();
         }
         return ok(Json.toJson(item));
     }
@@ -56,18 +55,29 @@ public class ItemController extends Controller {
     /**
      * HTTP Post request that creates a new Item
      *
-     * @param name The String name of a Item
-     * @param description The String description of a Item
-     * @param type The String type of a Item
      * @return Result Json of a item
      */
-    public Result createItem(final String name, final String description, final CharacterType type) {
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result createItem() {
+        final JsonNode body = request().body().asJson();
+        final String name = body.get("name").textValue();
+        final String description = body.get("description").textValue();
+        final String type = body.get("type").textValue();
+        if(name == null || description == null || type == null) {
+            return badRequest("Some data missing from request.");
+        }
         if(Item.find.query().where().eq("name", name).findUnique() != null) {
             return badRequest("A item already exists with the name, "+name);
         }
-        Item item = new Item(type, name, description);
-        item.save();
-        return ok(Json.toJson(item));
+        try {
+            CharacterType characterType = CharacterType.valueOf(type);
+            Item item = new Item(characterType, name, description);
+            item.save();
+            return ok(Json.toJson(item));
+        }catch(Exception e) {
+            Logger.info("An invalid CharacterType was supplied for updateItem");
+            return badRequest("The CharacterType supplied was invalid");
+        }
     }
 
     /**

@@ -23,7 +23,6 @@ public class AddonController extends Controller {
      *
      * @return Result Json list of addons
      */
-    @BodyParser.Of(BodyParser.Json.class)
     public Result getAllAddons() {
         List<Addon> addons;
         try {

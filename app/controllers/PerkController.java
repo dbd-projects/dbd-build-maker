@@ -23,7 +23,6 @@ public class PerkController extends Controller {
      *
      * @return Result Json list of perks
      */
-    @BodyParser.Of(BodyParser.Json.class)
     public Result getAllPerks() {
         List<Perk> perks;
         try {
@@ -48,7 +47,7 @@ public class PerkController extends Controller {
     public Result getPerk(final long id) {
         Perk perk = Perk.find.byId(id);
         if(perk == null) {
-            return notFound("Could not find perk by id: "+id);
+            return noContent();
         }
         return ok(Json.toJson(perk));
     }
@@ -56,18 +55,29 @@ public class PerkController extends Controller {
     /**
      * HTTP Post request that creates a new Perk
      *
-     * @param name The String name of a Perk
-     * @param description The String description of a Perk
-     * @param type The String type of a Perk
      * @return Result Json of a perk
      */
-    public Result createPerk(final String name, final String description, final CharacterType type) {
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result createPerk() {
+        final JsonNode body = request().body().asJson();
+        final String name = body.get("name").textValue();
+        final String description = body.get("description").textValue();
+        final String type = body.get("type").textValue();
+        if(name == null || description == null || type == null) {
+            return badRequest("Some data missing from request.");
+        }
         if(Perk.find.query().where().eq("name", name).findUnique() != null) {
             return badRequest("A perk already exists with the name, "+name);
         }
-        Perk perk = new Perk(type, name, description);
-        perk.save();
-        return ok(Json.toJson(perk));
+        try {
+            CharacterType characterType = CharacterType.valueOf(type);
+            Perk perk = new Perk(characterType, name, description);
+            perk.save();
+            return ok(Json.toJson(perk));
+        }catch(Exception e) {
+            Logger.info("An invalid CharacterType was supplied for updatePerk");
+            return badRequest("The CharacterType supplied was invalid");
+        }
     }
 
     /**

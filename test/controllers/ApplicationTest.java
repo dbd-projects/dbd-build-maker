@@ -27,7 +27,6 @@ public class ApplicationTest {
         Logger.info("...Test for OK result");
         assertEquals(OK, result.status());
         Assert.assertTrue(ControllerTestHelper.testContentType("application/json", result));
-        Assert.assertTrue(ControllerTestHelper.testCharset("UTF-8", result));
         Logger.info("...Test for expected string output");
         assertTrue(contentAsString(result).contains("Welcome to the beginnings of the Dead by Daylight Build Maker"));
     }

@@ -1,11 +1,12 @@
 package models;
 
-import com.avaje.ebean.Model;
+import io.ebean.Finder;
+import io.ebean.Model;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "addons")
+@Table(name = "perks")
 public class Perk extends Model {
     // Ebean Finder utility
     public final static Finder<Long, Perk> find = new Finder<>(Perk.class);

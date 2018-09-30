@@ -14,14 +14,4 @@ class ControllerTestHelper {
             return false;
         }
     }
-
-    static boolean testCharset(final String expected, final Result result) {
-        if(result.charset().isPresent()) {
-            Logger.info("...Test for utf-8 charset");
-            return expected.equals(result.charset().get());
-        }else {
-            Logger.error("...Expected charset of utf-8");
-            return false;
-        }
-    }
 }

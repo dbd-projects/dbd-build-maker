@@ -3,6 +3,7 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 import models.Addon;
+import models.CharacterType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,19 +57,48 @@ public class AddonControllerTest {
     }
 
     @Test
-    public void testGetZeroAddons() {
-        for(Addon addon : Addon.find.all()){
+    public void testGetAllAddons() {
+        createAddon().save();
+        Logger.info("Testing getAllAddons...");
+        Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
+                .uri(controllers.routes.AddonController.getAllAddons().url());
+        Result result = route(application, request);
+        Logger.info("...Test for OK result");
+        assertEquals(OK, result.status());
+        assertTrue(ControllerTestHelper.testContentType("application/json", result));
+    }
+
+    @Test
+    public void testGetAllAddonsWithNone() {
+        for(Addon addon: Addon.find.all()){
             addon.delete();
         }
-        Logger.info("Testing getAllAddons without any addons...");
-        Result result = new AddonController().getAllAddons();
-        Logger.info("...Test for No Content result");
+        Logger.info("Testing getAllAddons with none...");
+        Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
+                .uri(controllers.routes.AddonController.getAllAddons().url());
+        Result result = route(application, request);
+        Logger.info("...Test for NO CONTENT result");
         assertEquals(NO_CONTENT, result.status());
     }
 
     @Test
+    public void testGetAllAddonsWithType() {
+        createAddon().save();
+        String json = "type:"+CharacterType.KILLER;
+        JsonNode jsonNode = Json.toJson(json);
+        Logger.info("Testing getAllAddons with type...");
+        Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
+                .bodyJson(jsonNode)
+                .uri(controllers.routes.AddonController.getAllAddons().url());
+        Result result = route(application, request);
+        Logger.info("...Test for OK result");
+        assertEquals(OK, result.status());
+        assertTrue(ControllerTestHelper.testContentType("application/json", result));
+    }
+
+    @Test
     public void testCreateAddon() {
-        JsonNode jsonNode = Json.toJson(addon);
+        JsonNode jsonNode = Json.toJson(createAddon());
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(jsonNode)
                 .uri(controllers.routes.AddonController.createAddon().url());
@@ -78,7 +108,8 @@ public class AddonControllerTest {
 
     @Test
     public void testCreateExistingAddon() {
-        JsonNode jsonNode = Json.toJson(addon);
+        createAddon().save();
+        JsonNode jsonNode = Json.toJson(createAddon());
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(jsonNode)
                 .uri(controllers.routes.AddonController.createAddon().url());
@@ -87,21 +118,33 @@ public class AddonControllerTest {
     }
 
     @Test
-    public void testGetAllAddons() {
-        Logger.info("Testing getAllAddons...");
-        Result result = new AddonController().getAllAddons();
+    public void testGetAddon() {
+        Addon test = createAddon();
+        test.setId(100);
+        test.save();
+        Logger.info("Testing getAddon...");
+        Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
+                .uri(controllers.routes.AddonController.getAddon(100).url());
+        Result result = route(application, request);
         Logger.info("...Test for OK result");
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testGetAddon() {
-
+    public void testDeleteAddon() {
+        Addon test = createAddon();
+        test.save();
+        Logger.info("Testing deleteAddon...");
+        Http.RequestBuilder request = new Http.RequestBuilder().method("DELETE")
+                .uri(controllers.routes.AddonController.deleteAddon(test.getId()).url());
+        Result result = route(application, request);
+        Logger.info("...Test for OK result");
+        assertEquals(OK, result.status());
+        assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
-    @Test
-    public void testDeleteAddon() {
-
+    private Addon createAddon(){
+        return new Addon(CharacterType.KILLER, "billy", "booli");
     }
 }

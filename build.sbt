@@ -1,6 +1,6 @@
-name := "dbd-build-maker"
+name := "dbd-character-service"
 
-version := "1.0"
+version := "0.1.0"
 
 lazy val `dbd-build-maker` = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
 
@@ -10,6 +10,10 @@ scalaVersion := "2.11.11"
 
 libraryDependencies ++= Seq(javaJdbc, guice, javaWs)
 libraryDependencies += "org.mockito" % "mockito-core" % "2.21.0"
+
+sources in (Compile, doc) := Seq.empty
+
+publishArtifact in (Compile, packageDoc) := false
 
 unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
 

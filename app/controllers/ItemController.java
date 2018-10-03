@@ -24,18 +24,41 @@ public class ItemController extends Controller {
      * @return Result Json list of items
      */
     public Result getAllItems() {
-        List<Item> items;
-        try {
-            if(request().body().asJson().has("type")) {
-                String type = request().body().asJson().get("type").textValue();
-                items = Item.find.query().where().eq("type", type).findList();
-            }else {
-                items = Item.find.all();
-            }
+        List<Item> items = Item.find.all();
+        if(items.size() > 0) {
+            Logger.info("Returning list of Items with {} elements", items.size());
             return ok(Json.toJson(items));
-        }catch (NullPointerException e) {
-            return noContent();
         }
+        Logger.info("No Items to return");
+        return noContent();
+    }
+
+    /**
+     * HTTP Get request that returns all items of a type
+     *
+     * @return Result Json list of items
+     */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result getAllItemsType() {
+        List<Item> items;
+        final JsonNode json = request().body().asJson();
+        if(!json.has("type")) {
+            Logger.info("No type given for getAllItemsType");
+            return badRequest("No type given");
+        }
+        try {
+            CharacterType type = CharacterType.valueOf(json.get("type").textValue());
+            items = Item.find.query().where().eq("type", type).findList();
+        }catch(Exception e) {
+            Logger.info("Invalid type given");
+            return badRequest("Invalid type given");
+        }
+        if(items.size() > 0) {
+            Logger.info("Returning list of Items with {} elements", items.size());
+            return ok(Json.toJson(items));
+        }
+        Logger.info("No Items to return");
+        return noContent();
     }
 
     /**
@@ -60,18 +83,18 @@ public class ItemController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createItem() {
         final JsonNode body = request().body().asJson();
+        if(!body.has("name") || !body.has("description") || !body.has("type")) {
+            return badRequest("Some data missing from request.");
+        }
         final String name = body.get("name").textValue();
         final String description = body.get("description").textValue();
         final String type = body.get("type").textValue();
-        if(name == null || description == null || type == null) {
-            return badRequest("Some data missing from request.");
-        }
         if(Item.find.query().where().eq("name", name).findUnique() != null) {
             return badRequest("A item already exists with the name, "+name);
         }
         try {
-            CharacterType characterType = CharacterType.valueOf(type);
-            Item item = new Item(characterType, name, description);
+            final CharacterType characterType = CharacterType.valueOf(type);
+            final Item item = new Item(characterType, name, description);
             item.save();
             return ok(Json.toJson(item));
         }catch(Exception e) {

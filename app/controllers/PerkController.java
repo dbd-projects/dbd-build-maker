@@ -24,18 +24,41 @@ public class PerkController extends Controller {
      * @return Result Json list of perks
      */
     public Result getAllPerks() {
-        List<Perk> perks;
-        try {
-            if(request().body().asJson().has("type")) {
-                String type = request().body().asJson().get("type").textValue();
-                perks = Perk.find.query().where().eq("type", type).findList();
-            }else {
-                perks = Perk.find.all();
-            }
+        List<Perk> perks = Perk.find.all();
+        if(perks.size() > 0) {
+            Logger.info("Returning list of Perks with {} elements", perks.size());
             return ok(Json.toJson(perks));
-        }catch (NullPointerException e) {
-            return noContent();
         }
+        Logger.info("No Perks to return");
+        return noContent();
+    }
+
+    /**
+     * HTTP Get request that returns all perks of a type
+     *
+     * @return Result Json list of perks
+     */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result getAllPerksType() {
+        List<Perk> perks;
+        final JsonNode json = request().body().asJson();
+        if(!json.has("type")) {
+            Logger.info("No type given for getAllPerksType");
+            return badRequest("No type given");
+        }
+        try {
+            CharacterType type = CharacterType.valueOf(json.get("type").textValue());
+            perks = Perk.find.query().where().eq("type", type).findList();
+        }catch(Exception e) {
+            Logger.info("Invalid type given");
+            return badRequest("Invalid type given");
+        }
+        if(perks.size() > 0) {
+            Logger.info("Returning list of Perks with {} elements", perks.size());
+            return ok(Json.toJson(perks));
+        }
+        Logger.info("No Perks to return");
+        return noContent();
     }
 
     /**
@@ -60,18 +83,18 @@ public class PerkController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createPerk() {
         final JsonNode body = request().body().asJson();
+        if(!body.has("name") || !body.has("description") || !body.has("type")) {
+            return badRequest("Some data missing from request.");
+        }
         final String name = body.get("name").textValue();
         final String description = body.get("description").textValue();
         final String type = body.get("type").textValue();
-        if(name == null || description == null || type == null) {
-            return badRequest("Some data missing from request.");
-        }
         if(Perk.find.query().where().eq("name", name).findUnique() != null) {
             return badRequest("A perk already exists with the name, "+name);
         }
         try {
-            CharacterType characterType = CharacterType.valueOf(type);
-            Perk perk = new Perk(characterType, name, description);
+            final CharacterType characterType = CharacterType.valueOf(type);
+            final Perk perk = new Perk(characterType, name, description);
             perk.save();
             return ok(Json.toJson(perk));
         }catch(Exception e) {

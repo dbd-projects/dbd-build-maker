@@ -24,18 +24,41 @@ public class CharacterController extends Controller {
      * @return Result Json list of characters
      */
     public Result getAllCharacters() {
-        List<Character> characters;
-        try {
-            if(request().body().asJson().has("type")) {
-                String type = request().body().asJson().get("type").textValue();
-                characters = Character.find.query().where().eq("type", type).findList();
-            }else {
-                characters = Character.find.all();
-            }
+        List<Character> characters = Character.find.all();
+        if(characters.size() > 0) {
+            Logger.info("Returning list of Characters with {} elements", characters.size());
             return ok(Json.toJson(characters));
-        }catch (NullPointerException e) {
-            return noContent();
         }
+        Logger.info("No Characters to return");
+        return noContent();
+    }
+
+    /**
+     * HTTP Get request that returns all characters of a type
+     *
+     * @return Result Json list of characters
+     */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result getAllCharactersType() {
+        List<Character> characters;
+        final JsonNode json = request().body().asJson();
+        if(!json.has("type")) {
+            Logger.info("No type given for getAllCharactersType");
+            return badRequest("No type given");
+        }
+        try {
+            CharacterType type = CharacterType.valueOf(json.get("type").textValue());
+            characters = Character.find.query().where().eq("type", type).findList();
+        }catch(Exception e) {
+            Logger.info("Invalid type given");
+            return badRequest("Invalid type given");
+        }
+        if(characters.size() > 0) {
+            Logger.info("Returning list of Characters with {} elements", characters.size());
+            return ok(Json.toJson(characters));
+        }
+        Logger.info("No Characters to return");
+        return noContent();
     }
 
     /**
@@ -60,18 +83,18 @@ public class CharacterController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createCharacter() {
         final JsonNode body = request().body().asJson();
+        if(!body.has("name") || !body.has("description") || !body.has("type")) {
+            return badRequest("Some data missing from request.");
+        }
         final String name = body.get("name").textValue();
         final String description = body.get("description").textValue();
         final String type = body.get("type").textValue();
-        if(name == null || description == null || type == null) {
-            return badRequest("Some data missing from request.");
-        }
         if(Character.find.query().where().eq("name", name).findUnique() != null) {
             return badRequest("A character already exists with the name, "+name);
         }
         try {
-            CharacterType characterType = CharacterType.valueOf(type);
-            Character character = new Character(characterType, name, description);
+            final CharacterType characterType = CharacterType.valueOf(type);
+            final Character character = new Character(characterType, name, description);
             character.save();
             return ok(Json.toJson(character));
         }catch(Exception e) {

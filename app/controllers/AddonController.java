@@ -24,18 +24,41 @@ public class AddonController extends Controller {
      * @return Result Json list of addons
      */
     public Result getAllAddons() {
-        List<Addon> addons;
-        try {
-            if(request().body().asJson().has("type")) {
-                String type = request().body().asJson().get("type").textValue();
-                addons = Addon.find.query().where().eq("type", type).findList();
-            }else {
-                addons = Addon.find.all();
-            }
+        List<Addon> addons = Addon.find.all();
+        if(addons.size() > 0) {
+            Logger.info("Returning list of Addons with {} elements", addons.size());
             return ok(Json.toJson(addons));
-        }catch (NullPointerException e) {
-            return noContent();
         }
+        Logger.info("No Addons to return");
+        return noContent();
+    }
+
+    /**
+     * HTTP Get request that returns all addons of a type
+     *
+     * @return Result Json list of addons
+     */
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result getAllAddonsType() {
+        List<Addon> addons;
+        final JsonNode json = request().body().asJson();
+        if(!json.has("type")) {
+            Logger.info("No type given for getAllAddonsType");
+            return badRequest("No type given");
+        }
+        try {
+            CharacterType type = CharacterType.valueOf(json.get("type").textValue());
+            addons = Addon.find.query().where().eq("type", type).findList();
+        }catch(Exception e) {
+            Logger.info("Invalid type given");
+            return badRequest("Invalid type given");
+        }
+        if(addons.size() > 0) {
+            Logger.info("Returning list of Addons with {} elements", addons.size());
+            return ok(Json.toJson(addons));
+        }
+        Logger.info("No Addons to return");
+        return noContent();
     }
 
     /**
@@ -60,18 +83,18 @@ public class AddonController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public Result createAddon() {
         final JsonNode body = request().body().asJson();
+        if(!body.has("name") || !body.has("description") || !body.has("type")) {
+            return badRequest("Some data missing from request.");
+        }
         final String name = body.get("name").textValue();
         final String description = body.get("description").textValue();
         final String type = body.get("type").textValue();
-        if(name == null || description == null || type == null) {
-            return badRequest("Some data missing from request.");
-        }
         if(Addon.find.query().where().eq("name", name).findUnique() != null) {
             return badRequest("A addon already exists with the name, "+name);
         }
         try {
-            CharacterType characterType = CharacterType.valueOf(type);
-            Addon addon = new Addon(characterType, name, description);
+            final CharacterType characterType = CharacterType.valueOf(type);
+            final Addon addon = new Addon(characterType, name, description);
             addon.save();
             return ok(Json.toJson(addon));
         }catch(Exception e) {

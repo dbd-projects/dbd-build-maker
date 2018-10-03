@@ -3,7 +3,7 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
-import models.Addon;
+import models.Character;
 import models.CharacterType;
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +25,7 @@ import static play.mvc.Http.Status.NO_CONTENT;
 import static play.test.Helpers.OK;
 import static play.test.Helpers.route;
 
-public class AddonControllerTest {
+public class CharacterControllerTest {
 
     private Application application;
     private Database database;
@@ -54,213 +54,213 @@ public class AddonControllerTest {
     }
 
     @Test
-    public void testGetAllAddons() {
-        createAddon().save();
-        Logger.info("Testing getAllAddons...");
+    public void testGetAllCharacters() {
+        createCharacter().save();
+        Logger.info("Testing getAllCharacters...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
-                .uri(controllers.routes.AddonController.getAllAddons().url());
+                .uri(routes.CharacterController.getAllCharacters().url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testGetAllAddonsWithNone() {
-        Logger.info("Testing getAllAddons with none...");
+    public void testGetAllCharactersWithNone() {
+        Logger.info("Testing getAllCharacters with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
-                .uri(controllers.routes.AddonController.getAllAddons().url());
+                .uri(routes.CharacterController.getAllCharacters().url());
         Result result = route(application, request);
         assertEquals(NO_CONTENT, result.status());
     }
 
     @Test
-    public void testGetAllAddonsTypeWithNone() {
+    public void testGetAllCharactersTypeWithNone() {
         ObjectNode json = Json.newObject();
         json.put("type",String.valueOf(CharacterType.KILLER));
-        Logger.info("Testing getAllAddonsType with none...");
+        Logger.info("Testing getAllCharactersType with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.getAllAddonsType().url());
+                .uri(routes.CharacterController.getAllCharactersType().url());
         Result result = route(application, request);
         assertEquals(NO_CONTENT, result.status());
     }
 
     @Test
-    public void testGetAllAddonsType() {
-        createAddon().save();
+    public void testGetAllCharactersType() {
+        createCharacter().save();
         ObjectNode json = Json.newObject();
         json.put("type",String.valueOf(CharacterType.KILLER));
-        Logger.info("Testing getAllAddonsType...");
+        Logger.info("Testing getAllCharactersType...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.getAllAddonsType().url());
+                .uri(routes.CharacterController.getAllCharactersType().url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testGetAllAddonsBadType() {
+    public void testGetAllCharactersBadType() {
         ObjectNode json = Json.newObject();
         json.put("type","invalid");
-        Logger.info("Testing getAllAddonsType with bad type...");
+        Logger.info("Testing getAllCharactersType with bad type...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.getAllAddonsType().url());
+                .uri(routes.CharacterController.getAllCharactersType().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testGetAllAddonsNoType() {
+    public void testGetAllCharactersNoType() {
         ObjectNode json = Json.newObject();
         json.put("boost","chuck");
-        Logger.info("Testing getAllAddonsType with bad type...");
+        Logger.info("Testing getAllCharactersType with bad type...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.getAllAddonsType().url());
+                .uri(routes.CharacterController.getAllCharactersType().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testCreateAddon() {
-        Logger.info("Testing createAddon...");
-        JsonNode jsonNode = Json.toJson(createAddon());
+    public void testCreateCharacter() {
+        Logger.info("Testing createCharacter...");
+        JsonNode jsonNode = Json.toJson(createCharacter());
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(jsonNode)
-                .uri(controllers.routes.AddonController.createAddon().url());
+                .uri(routes.CharacterController.createCharacter().url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
     }
 
     @Test
-    public void testCreateExistingAddon() {
-        Logger.info("Testing createAddon with existing Addon...");
-        createAddon().save();
-        JsonNode jsonNode = Json.toJson(createAddon());
+    public void testCreateExistingCharacter() {
+        Logger.info("Testing createCharacter with existing Character...");
+        createCharacter().save();
+        JsonNode jsonNode = Json.toJson(createCharacter());
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(jsonNode)
-                .uri(controllers.routes.AddonController.createAddon().url());
+                .uri(routes.CharacterController.createCharacter().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testCreateAddonWithNull() {
-        Logger.info("Testing createAddon with existing Addon...");
+    public void testCreateCharacterWithNull() {
+        Logger.info("Testing createCharacter with existing Character...");
         JsonNode jsonNode = Json.toJson("'nope':'yep'");
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(jsonNode)
-                .uri(controllers.routes.AddonController.createAddon().url());
+                .uri(routes.CharacterController.createCharacter().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testCreateAddonBadType() {
+    public void testCreateCharacterBadType() {
         ObjectNode json = Json.newObject();
         json.put("name","billy");
         json.put("description","booli");
         json.put("type","invalid");
-        Logger.info("Testing createAddon with bad type...");
+        Logger.info("Testing createCharacter with bad type...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.createAddon().url());
+                .uri(routes.CharacterController.createCharacter().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testGetAddon() {
-        Addon test = createAddon();
+    public void testGetCharacter() {
+        Character test = createCharacter();
         test.setId(100);
         test.save();
-        Logger.info("Testing getAddon...");
+        Logger.info("Testing getCharacter...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
-                .uri(controllers.routes.AddonController.getAddon(100).url());
+                .uri(routes.CharacterController.getCharacter(100).url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testGetNoAddon() {
-        Logger.info("Testing getAddon with none...");
+    public void testGetNoCharacter() {
+        Logger.info("Testing getCharacter with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
-                .uri(controllers.routes.AddonController.getAddon(100).url());
+                .uri(routes.CharacterController.getCharacter(100).url());
         Result result = route(application, request);
         assertEquals(NO_CONTENT, result.status());
     }
 
     @Test
-    public void testUpdateAddon() {
-        Addon testAddon = createAddon();
-        testAddon.setId(100);
-        testAddon.save();
-        testAddon.setName("booli");
-        testAddon.setDescription("billy");
-        testAddon.setType(CharacterType.SURVIVOR);
-        JsonNode json = Json.toJson(testAddon);
-        Logger.info("Testing updateAddon...");
+    public void testUpdateCharacter() {
+        Character testCharacter = createCharacter();
+        testCharacter.setId(100);
+        testCharacter.save();
+        testCharacter.setName("booli");
+        testCharacter.setDescription("billy");
+        testCharacter.setType(CharacterType.SURVIVOR);
+        JsonNode json = Json.toJson(testCharacter);
+        Logger.info("Testing updateCharacter...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("PUT")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.updateAddon(100).url());
+                .uri(routes.CharacterController.updateCharacter(100).url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testUpdateNoAddon() {
-        JsonNode json = Json.toJson(createAddon());
-        Logger.info("Testing updateAddon with none...");
+    public void testUpdateNoCharacter() {
+        JsonNode json = Json.toJson(createCharacter());
+        Logger.info("Testing updateCharacter with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("PUT")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.updateAddon(100).url());
+                .uri(routes.CharacterController.updateCharacter(100).url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testUpdateAddonBadType() {
-        Addon testAddon = createAddon();
-        testAddon.setId(100);
-        testAddon.save();
+    public void testUpdateCharacterBadType() {
+        Character testCharacter = createCharacter();
+        testCharacter.setId(100);
+        testCharacter.save();
         ObjectNode json = Json.newObject();
         json.put("name", "booli");
         json.put("description", "billy");
         json.put("type", "invalid");
-        Logger.info("Testing updateAddon with none...");
+        Logger.info("Testing updateCharacter with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("PUT")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.updateAddon(100).url());
+                .uri(routes.CharacterController.updateCharacter(100).url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testDeleteAddon() {
-        Addon test = createAddon();
+    public void testDeleteCharacter() {
+        Character test = createCharacter();
         test.save();
-        Logger.info("Testing deleteAddon...");
+        Logger.info("Testing deleteCharacter...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("DELETE")
-                .uri(controllers.routes.AddonController.deleteAddon(test.getId()).url());
+                .uri(routes.CharacterController.deleteCharacter(test.getId()).url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testDeleteNoAddon() {
-        Logger.info("Testing deleteAddon...");
+    public void testDeleteNoCharacter() {
+        Logger.info("Testing deleteCharacter...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("DELETE")
-                .uri(controllers.routes.AddonController.deleteAddon(0).url());
+                .uri(routes.CharacterController.deleteCharacter(0).url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
-    private Addon createAddon() {
-        return new Addon(CharacterType.KILLER, "billy", "booli");
+    private Character createCharacter() {
+        return new Character(CharacterType.KILLER, "billy", "booli");
     }
 }

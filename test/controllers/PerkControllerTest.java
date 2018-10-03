@@ -3,8 +3,8 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
-import models.Addon;
 import models.CharacterType;
+import models.Perk;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ import static play.mvc.Http.Status.NO_CONTENT;
 import static play.test.Helpers.OK;
 import static play.test.Helpers.route;
 
-public class AddonControllerTest {
+public class PerkControllerTest {
 
     private Application application;
     private Database database;
@@ -54,213 +54,213 @@ public class AddonControllerTest {
     }
 
     @Test
-    public void testGetAllAddons() {
-        createAddon().save();
-        Logger.info("Testing getAllAddons...");
+    public void testGetAllPerks() {
+        createPerk().save();
+        Logger.info("Testing getAllPerks...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
-                .uri(controllers.routes.AddonController.getAllAddons().url());
+                .uri(controllers.routes.PerkController.getAllPerks().url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testGetAllAddonsWithNone() {
-        Logger.info("Testing getAllAddons with none...");
+    public void testGetAllPerksWithNone() {
+        Logger.info("Testing getAllPerks with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
-                .uri(controllers.routes.AddonController.getAllAddons().url());
+                .uri(controllers.routes.PerkController.getAllPerks().url());
         Result result = route(application, request);
         assertEquals(NO_CONTENT, result.status());
     }
 
     @Test
-    public void testGetAllAddonsTypeWithNone() {
+    public void testGetAllPerksTypeWithNone() {
         ObjectNode json = Json.newObject();
         json.put("type",String.valueOf(CharacterType.KILLER));
-        Logger.info("Testing getAllAddonsType with none...");
+        Logger.info("Testing getAllPerksType with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.getAllAddonsType().url());
+                .uri(controllers.routes.PerkController.getAllPerksType().url());
         Result result = route(application, request);
         assertEquals(NO_CONTENT, result.status());
     }
 
     @Test
-    public void testGetAllAddonsType() {
-        createAddon().save();
+    public void testGetAllPerksType() {
+        createPerk().save();
         ObjectNode json = Json.newObject();
         json.put("type",String.valueOf(CharacterType.KILLER));
-        Logger.info("Testing getAllAddonsType...");
+        Logger.info("Testing getAllPerksType...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.getAllAddonsType().url());
+                .uri(controllers.routes.PerkController.getAllPerksType().url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testGetAllAddonsBadType() {
+    public void testGetAllPerksBadType() {
         ObjectNode json = Json.newObject();
         json.put("type","invalid");
-        Logger.info("Testing getAllAddonsType with bad type...");
+        Logger.info("Testing getAllPerksType with bad type...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.getAllAddonsType().url());
+                .uri(controllers.routes.PerkController.getAllPerksType().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testGetAllAddonsNoType() {
+    public void testGetAllPerksNoType() {
         ObjectNode json = Json.newObject();
         json.put("boost","chuck");
-        Logger.info("Testing getAllAddonsType with bad type...");
+        Logger.info("Testing getAllPerksType with bad type...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.getAllAddonsType().url());
+                .uri(controllers.routes.PerkController.getAllPerksType().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testCreateAddon() {
-        Logger.info("Testing createAddon...");
-        JsonNode jsonNode = Json.toJson(createAddon());
+    public void testCreatePerk() {
+        Logger.info("Testing createPerk...");
+        JsonNode jsonNode = Json.toJson(createPerk());
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(jsonNode)
-                .uri(controllers.routes.AddonController.createAddon().url());
+                .uri(controllers.routes.PerkController.createPerk().url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
     }
 
     @Test
-    public void testCreateExistingAddon() {
-        Logger.info("Testing createAddon with existing Addon...");
-        createAddon().save();
-        JsonNode jsonNode = Json.toJson(createAddon());
+    public void testCreateExistingPerk() {
+        Logger.info("Testing createPerk with existing Perk...");
+        createPerk().save();
+        JsonNode jsonNode = Json.toJson(createPerk());
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(jsonNode)
-                .uri(controllers.routes.AddonController.createAddon().url());
+                .uri(controllers.routes.PerkController.createPerk().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testCreateAddonWithNull() {
-        Logger.info("Testing createAddon with existing Addon...");
+    public void testCreatePerkWithNull() {
+        Logger.info("Testing createPerk with existing Perk...");
         JsonNode jsonNode = Json.toJson("'nope':'yep'");
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(jsonNode)
-                .uri(controllers.routes.AddonController.createAddon().url());
+                .uri(controllers.routes.PerkController.createPerk().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testCreateAddonBadType() {
+    public void testCreatePerkBadType() {
         ObjectNode json = Json.newObject();
         json.put("name","billy");
         json.put("description","booli");
         json.put("type","invalid");
-        Logger.info("Testing createAddon with bad type...");
+        Logger.info("Testing createPerk with bad type...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("POST")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.createAddon().url());
+                .uri(controllers.routes.PerkController.createPerk().url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testGetAddon() {
-        Addon test = createAddon();
+    public void testGetPerk() {
+        Perk test = createPerk();
         test.setId(100);
         test.save();
-        Logger.info("Testing getAddon...");
+        Logger.info("Testing getPerk...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
-                .uri(controllers.routes.AddonController.getAddon(100).url());
+                .uri(controllers.routes.PerkController.getPerk(100).url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testGetNoAddon() {
-        Logger.info("Testing getAddon with none...");
+    public void testGetNoPerk() {
+        Logger.info("Testing getPerk with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("GET")
-                .uri(controllers.routes.AddonController.getAddon(100).url());
+                .uri(controllers.routes.PerkController.getPerk(100).url());
         Result result = route(application, request);
         assertEquals(NO_CONTENT, result.status());
     }
 
     @Test
-    public void testUpdateAddon() {
-        Addon testAddon = createAddon();
-        testAddon.setId(100);
-        testAddon.save();
-        testAddon.setName("booli");
-        testAddon.setDescription("billy");
-        testAddon.setType(CharacterType.SURVIVOR);
-        JsonNode json = Json.toJson(testAddon);
-        Logger.info("Testing updateAddon...");
+    public void testUpdatePerk() {
+        Perk testPerk = createPerk();
+        testPerk.setId(100);
+        testPerk.save();
+        testPerk.setName("booli");
+        testPerk.setDescription("billy");
+        testPerk.setType(CharacterType.SURVIVOR);
+        JsonNode json = Json.toJson(testPerk);
+        Logger.info("Testing updatePerk...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("PUT")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.updateAddon(100).url());
+                .uri(controllers.routes.PerkController.updatePerk(100).url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testUpdateNoAddon() {
-        JsonNode json = Json.toJson(createAddon());
-        Logger.info("Testing updateAddon with none...");
+    public void testUpdateNoPerk() {
+        JsonNode json = Json.toJson(createPerk());
+        Logger.info("Testing updatePerk with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("PUT")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.updateAddon(100).url());
+                .uri(controllers.routes.PerkController.updatePerk(100).url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testUpdateAddonBadType() {
-        Addon testAddon = createAddon();
-        testAddon.setId(100);
-        testAddon.save();
+    public void testUpdatePerkBadType() {
+        Perk testPerk = createPerk();
+        testPerk.setId(100);
+        testPerk.save();
         ObjectNode json = Json.newObject();
         json.put("name", "booli");
         json.put("description", "billy");
         json.put("type", "invalid");
-        Logger.info("Testing updateAddon with none...");
+        Logger.info("Testing updatePerk with none...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("PUT")
                 .bodyJson(json)
-                .uri(controllers.routes.AddonController.updateAddon(100).url());
+                .uri(controllers.routes.PerkController.updatePerk(100).url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
     @Test
-    public void testDeleteAddon() {
-        Addon test = createAddon();
+    public void testDeletePerk() {
+        Perk test = createPerk();
         test.save();
-        Logger.info("Testing deleteAddon...");
+        Logger.info("Testing deletePerk...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("DELETE")
-                .uri(controllers.routes.AddonController.deleteAddon(test.getId()).url());
+                .uri(controllers.routes.PerkController.deletePerk(test.getId()).url());
         Result result = route(application, request);
         assertEquals(OK, result.status());
         assertTrue(ControllerTestHelper.testContentType("application/json", result));
     }
 
     @Test
-    public void testDeleteNoAddon() {
-        Logger.info("Testing deleteAddon...");
+    public void testDeleteNoPerk() {
+        Logger.info("Testing deletePerk...");
         Http.RequestBuilder request = new Http.RequestBuilder().method("DELETE")
-                .uri(controllers.routes.AddonController.deleteAddon(0).url());
+                .uri(controllers.routes.PerkController.deletePerk(0).url());
         Result result = route(application, request);
         assertEquals(BAD_REQUEST, result.status());
     }
 
-    private Addon createAddon() {
-        return new Addon(CharacterType.KILLER, "billy", "booli");
+    private Perk createPerk() {
+        return new Perk(CharacterType.KILLER, "billy", "booli");
     }
 }

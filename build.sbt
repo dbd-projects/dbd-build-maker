@@ -25,12 +25,12 @@ jacocoExcludes in Test := Seq(
   "jooq.*",
   "Module",
   "router.Routes*",
-  "*.routes*"
+  "*.routes*",
+  "*.scala"
 )
 
 jacocoIncludes in Test := Seq(
-  "controllers.*",
-  "models.*"
+  "controllers.*"
 )
 
 jacocoReportSettings := JacocoReportSettings()
@@ -38,9 +38,9 @@ jacocoReportSettings := JacocoReportSettings()
   .withThresholds(
     JacocoThresholds(
       instruction = 0,
-      method = 0,
-      branch = 0,
+      method = 80,
+      branch = 50,
       complexity = 0,
       line = 90,
-      clazz = 100)
+      clazz = 90)
   )

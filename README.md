@@ -11,10 +11,46 @@ similar functions for the *different* data used in it.
 ## Internal Endpoints
 FYI, this service has no external endpoints.
 
-### Characters
+### All
+All endpoints start with `/characters`, `/items`, `/addons`, or `/perks`.
 
-### Items
+To `GET` all, just use the base URL listed above.
 
-### Addons
+#### GET all by type
+`/type`
 
-### Perks
+Takes a json body, i.e.
+```
+{
+    'type': "killer"
+}
+```
+#### GET an object
+`/:id`
+
+#### POST a new object
+`/new`
+
+Takes a json body, i.e.
+```
+{
+    'name': 'Billy',
+    'description': 'booli',
+    'type': 'killer'
+}
+```
+
+#### PUT an updated object
+`/:id`
+
+Takes a json body, i.e.
+```
+{
+    'name': 'chuck',
+    'description': 'boosted',
+    'type': 'survivor'
+}
+```
+
+#### DELETE an object
+`/:id`
